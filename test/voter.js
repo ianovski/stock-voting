@@ -57,16 +57,4 @@ contract("Voter", function (accounts) {
     });
     expect(verification).equal("tsla");
   });
-
-  it("has no votes by default", async function () {
-    let votes = await voter.getVotes.call({ from: firstAccount });
-    expect(toNumbers(votes)).to.deep.equal([0, 0]);
-  });
-
-  it("can vote with a string option", async function () {
-    await voter.methods["vote(string)"]("coffee", { from: firstAccount });
-    let votes = await voter.getVotes.call({ from: firstAccount });
-
-    expect(toNumbers(votes)).to.deep.equal([1, 0]);
-  });
 });

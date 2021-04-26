@@ -53,7 +53,7 @@ contract Voter {
        voterSecurityMap[msg.sender] = voterSecurities;       
     }
 
-    function voteSecurity(string memory securityName, VotingState votingState) public returns(string memory securityNameOutput) {
+    function voteSecurity(string memory securityName, VotingState votingState) public {
         uint index = voterSecurityMap[msg.sender].count;
         voterSecurityMap[msg.sender].count++;
 
@@ -67,8 +67,6 @@ contract Voter {
         });
 
         voterSecurityMap[msg.sender].securityList[index] = security;
-        securityNameOutput = voterSecurityMap[msg.sender].securityList[index].name;
-        // return securityNameOutput; 
     } 
 
     function getVoterSecurityCount() public view returns(uint count){

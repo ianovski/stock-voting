@@ -4,7 +4,7 @@ contract Voter {
     mapping (address => bool) isRegistered;
     address[] public registeredVoters;
     
-    enum VotingState { NotVoted, UpVoted, DownVoted }
+    enum VotingState { UnVoted, UpVoted, DownVoted }
 
     struct Security{
         string name;
@@ -79,5 +79,10 @@ contract Voter {
     function getVoterSecurityNameByIndex(uint index) public view returns(string memory securityName){
         securityName = voterSecurityMap[msg.sender].securityList[index].name;
         return securityName;
+    }
+
+    function getVoterSecurityStateByIndex(uint index) public view returns(VotingState state){
+        state = voterSecurityMap[msg.sender].securityList[index].state;
+        return state;
     }
 }

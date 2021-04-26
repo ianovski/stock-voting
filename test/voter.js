@@ -15,7 +15,7 @@ contract("Voter", function (accounts) {
     expect(verification).equal(true);
   });
 
-  it("can verify registered voter has registered", async function () {
+  it("can verify registered voter is registered", async function () {
     await voter.methods["registerVoter()"]({ from: firstAccount });
     let verification = await voter.hasRegistered.call({ from: firstAccount });
     expect(verification).equal(true);
@@ -44,7 +44,7 @@ contract("Voter", function (accounts) {
     expect(parseInt(verification)).equal(1);
   });
 
-  it("can verify upvoted stock added to user map", async function () {
+  it("can verify upvoted stock name added to user map", async function () {
     let stockName = "tsla";
     let index = 0;
     let voteState = 1;
@@ -56,5 +56,19 @@ contract("Voter", function (accounts) {
       from: firstAccount,
     });
     expect(verification).equal("tsla");
+  });
+
+  it("can verify upvoted stock state added to user map", async function () {
+    let stockName = "tsla";
+    let index = 0;
+    let voteState = 1;
+    await voter.methods["initSecurityVoterMap()"]({ from: firstAccount });
+    await voter.voteSecurity(stockName, voteState, {
+      from: firstAccount,
+    });
+    let verification = await voter.getVoterSecurityStateByIndex.call(index, {
+      from: firstAccount,
+    });
+    expect(parseInt(verification)).equal(1);
   });
 });

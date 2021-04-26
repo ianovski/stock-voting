@@ -83,4 +83,12 @@ contract Voter {
         state = voterSecurityMap[msg.sender].securityList[index].state;
         return state;
     }
+
+    function setSecurityPos(string memory securityName, VotingState votingState) public{
+       //TODO
+    }
+
+    function getSecurityPos(string memory securityName) public{
+        //TODO
+    }
 }

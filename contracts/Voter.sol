@@ -23,12 +23,12 @@ contract Voter {
     string[] public securities;
     struct SecurityPos{
         uint pos;
+        uint totalVotes;
+        uint upVotes;
+        uint downVotes;
         bool exists;
     }
     mapping (string => SecurityPos) posOfSecurity;
-
-    string[] public options;
-    bool votingStarted;
     
     function registerVoter() public returns (bool output){
         isRegistered[msg.sender] = true;

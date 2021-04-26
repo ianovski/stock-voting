@@ -7,7 +7,6 @@ contract("Voter", function (accounts) {
   beforeEach(async function () {
     firstAccount = accounts[0];
     voter = await Voter.new();
-    // await setOptions(firstAccount, ["coffee", "tea"]);
   });
 
   it("can register new voter", async function () {
@@ -45,13 +44,8 @@ contract("Voter", function (accounts) {
   });
 
   it("can verify upvoted stock name added to user map", async function () {
-    let stockName = "tsla";
     let index = 0;
-    let voteState = 1;
-    await voter.methods["initSecurityVoterMap()"]({ from: firstAccount });
-    await voter.voteSecurity(stockName, voteState, {
-      from: firstAccount,
-    });
+    await upVoteByName("tsla");
     let verification = await voter.getVoterSecurityNameByIndex.call(index, {
       from: firstAccount,
     });
@@ -59,16 +53,19 @@ contract("Voter", function (accounts) {
   });
 
   it("can verify upvoted stock state added to user map", async function () {
-    let stockName = "tsla";
     let index = 0;
-    let voteState = 1;
-    await voter.methods["initSecurityVoterMap()"]({ from: firstAccount });
-    await voter.voteSecurity(stockName, voteState, {
-      from: firstAccount,
-    });
+    await upVoteByName("tsla");
     let verification = await voter.getVoterSecurityStateByIndex.call(index, {
       from: firstAccount,
     });
     expect(parseInt(verification)).equal(1);
   });
+
+  async function upVoteByName(stockName) {
+    let voteState = 1;
+    await voter.methods["initSecurityVoterMap()"]({ from: firstAccount });
+    await voter.voteSecurity(stockName, voteState, {
+      from: firstAccount,
+    });
+  }
 });

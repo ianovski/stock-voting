@@ -61,6 +61,16 @@ contract("Voter", function (accounts) {
     expect(parseInt(verification)).equal(1);
   });
 
+  it("can verify initializing ranking position struct", async function () {
+    await voter.initSecurityPos('tsla', 1, {
+      from: firstAccount,
+    });
+    let verification = await voter.getSecurityPos.call('tsla', {
+      from: firstAccount,
+    });
+    expect(parseInt(verification)).equal(0);
+  });
+
   async function upVoteByName(stockName) {
     let voteState = 1;
     await voter.methods["initSecurityVoterMap()"]({ from: firstAccount });

@@ -22,14 +22,33 @@ contract Voter {
 
     string[] public securities;
     struct SecurityPos{
+        string name;
         uint pos;
         uint totalVotes;
         uint upVotes;
         uint downVotes;
         bool exists;
+        string next;
+        string prev;
     }
-    mapping (string => SecurityPos) posOfSecurity;
+    mapping (string => SecurityPos) securityVotes;
     
+    function initSecurityPos(string memory stockName, VotingState voteState) public{
+        uint upVotes = voteState == VotingState.UpVoted ? 1 : 0;
+        uint downVotes = voteState == VotingState.DownVoted ? 1 : 0;
+        SecurityPos memory securityPos = SecurityPos({
+            name:stockName,
+            pos: 0,
+            totalVotes: 1,
+            upVotes: upVotes,
+            downVotes: downVotes,
+            exists: true,
+            next: 'none',
+            prev: 'none'
+        });
+        securityVotes[stockName] = securityPos;
+    }
+
     function registerVoter() public returns (bool output){
         isRegistered[msg.sender] = true;
         registeredVoters.push(msg.sender);
@@ -69,6 +88,10 @@ contract Voter {
         voterSecurityMap[msg.sender].securityList[index] = security;
     } 
 
+    /**
+    * @dev Get number of securities that voter has voted for
+    * @return number of securities
+    */
     function getVoterSecurityCount() public view returns(uint count){
         count = voterSecurityMap[msg.sender].count;
         return count;
@@ -88,7 +111,12 @@ contract Voter {
        //TODO
     }
 
-    function getSecurityPos(string memory securityName) public{
-        //TODO
+    /**
+     * @dev gets position of security in overall stock ranking
+     * @param securityName stock ticker
+     * @return position
+     */
+    function getSecurityPos(string memory securityName) public view returns (uint pos){
+        return securityVotes[securityName].pos;
     }
 }

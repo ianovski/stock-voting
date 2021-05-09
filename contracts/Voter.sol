@@ -23,25 +23,52 @@ contract Voter {
     string[] public securities;
     struct SecurityPos{
         string name;
-        uint pos;
-        uint totalVotes;
         uint upVotes;
         uint downVotes;
+        int score;
         bool exists;
         string next;
         string prev;
     }
     mapping (string => SecurityPos) securityVotes;
     
+    /**
+     * @dev initializes security position linked list
+     * @param stockName stock ticker name
+     * @param voteState vote state input (up, down, unvote)
+     */
     function initSecurityPos(string memory stockName, VotingState voteState) public{
         uint upVotes = voteState == VotingState.UpVoted ? 1 : 0;
         uint downVotes = voteState == VotingState.DownVoted ? 1 : 0;
         SecurityPos memory securityPos = SecurityPos({
             name:stockName,
-            pos: 0,
-            totalVotes: 1,
             upVotes: upVotes,
             downVotes: downVotes,
+            score: upVotes - downVotes,
+            exists: true,
+            next: 'none',
+            prev: 'none'
+        });
+        securityVotes[0] = securityPos;
+    }
+
+    /**
+    * @dev add new security to security pos linked list
+    * @param stockName stock ticker name
+    * @param voteState vote state (up, down, unvote)
+    */
+    function appendSecurityPos(string memory stockName, VotingState voteState) public{
+        // TODO: find out which securities have values of updown<=downvote to find last position in rank (tied for last)
+        uint upVotes = voteState == VotingState.UpVoted ? 1 : 0;
+        uint downVotes = voteState == VotingState.DownVoted ? 1 : 0;
+        int score = upVotes - downVotes;
+        uint position = findSecurityPosByScore(score);
+        // if tied, how do you update all following values?
+        SecurityPos memory securityPos = SecurityPos({
+            name:stockName,
+            upVotes: upVotes,
+            downVotes: downVotes,
+            score: 1,
             exists: true,
             next: 'none',
             prev: 'none'
@@ -49,6 +76,50 @@ contract Voter {
         securityVotes[stockName] = securityPos;
     }
 
+    /**
+     * @dev binary search implementation to find the position of a security given a score (random if tied)
+     * @param score - the net score of a security
+     * @return the position of the security
+     */
+    function findSecurityNameByScore(int score) public returns (string name){
+        uint securitiesCount = securities.length;
+        name = binarySearchPosScore(score, 0, securitiesCount-1);
+        return position > 0 ? position : securitiesCount;
+    }
+
+    /**
+     * @dev return the name of a security with the desired score
+     * @param target - targetted score
+     * @param left - leftmost boundary
+     * @param right - rightmost boundary
+     * @return name or security
+    */
+    function binarySearchNameScore(int target, uint left, uint right) returns(string name){
+        if(left > right){
+            return 'none';
+        }
+        uint mid = left + ((right-left)/2);
+        if(securityVotes[mid].score == target){
+            return securityVotes[mid].name;
+        } else if (target < securityVotes[mid].score){
+            return binarySearchPosScore(target, left, mid-1);
+        } else{
+            return binarySearchPosScore(target, mid+1, right);
+        }
+    }
+
+    /**
+     * @dev returns the name of a security in the SecurityPos struct given an index
+     * @param _index - index of item in securityPos
+     * @return name of security at given index
+     */
+    function getSecurityPosByIndex(int _index) returns string(_name){
+        string currentName;
+        for(int i = 0; i<_index; i++){
+
+        }
+
+    }
     function registerVoter() public returns (bool output){
         isRegistered[msg.sender] = true;
         registeredVoters.push(msg.sender);

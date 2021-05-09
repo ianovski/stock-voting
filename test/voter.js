@@ -45,7 +45,8 @@ contract("Voter", function (accounts) {
 
   it("can verify upvoted stock name added to user map", async function () {
     let index = 0;
-    await upVoteByName("tsla");
+    await initAccount(firstAccount);
+    await upVoteByName("tsla", firstAccount);
     let verification = await voter.getVoterSecurityNameByIndex.call(index, {
       from: firstAccount,
     });
@@ -54,28 +55,49 @@ contract("Voter", function (accounts) {
 
   it("can verify upvoted stock state added to user map", async function () {
     let index = 0;
-    await upVoteByName("tsla");
+    await initAccount(firstAccount);
+    await upVoteByName("tsla", firstAccount);
     let verification = await voter.getVoterSecurityStateByIndex.call(index, {
       from: firstAccount,
     });
     expect(parseInt(verification)).equal(1);
   });
-
-  it("can verify initializing ranking position struct", async function () {
-    await voter.initSecurityPos('tsla', 1, {
+  
+  it("can verify fetching security name by score with single voting account initialized", async function () {
+    let index = 0;
+    await initAccount(firstAccount);
+    await upVoteByName("tsla", firstAccount);
+    await upVoteByName("tsla", firstAccount);
+    await upVoteByName("tsla", firstAccount);
+    await upVoteByName("tsla", firstAccount);
+    await upVoteByName("nflx", firstAccount);
+    await upVoteByName("nflx", firstAccount);
+    await upVoteByName("amzn", firstAccount);
+    let verification = await voter.getSecurityNameByScore.call(4, {
       from: firstAccount,
     });
-    let verification = await voter.getSecurityPos.call('tsla', {
-      from: firstAccount,
-    });
-    expect(parseInt(verification)).equal(0);
+    expect(verification).equal("tsla");
   });
 
-  async function upVoteByName(stockName) {
+
+  // it("can verify initializing ranking position struct", async function () {
+  //   await voter.initSecurityPos('tsla', 1, {
+  //     from: firstAccount,
+  //   });
+  //   let verification = await voter.getSecurityPos.call('tsla', {
+  //     from: firstAccount,
+  //   });
+  //   expect(parseInt(verification)).equal(0);
+  // });
+
+  async function initAccount(accountAddress){
+    await voter.methods["initSecurityVoterMap()"]({ from: accountAddress });
+  }
+
+  async function upVoteByName(stockName, accountAddress) {
     let voteState = 1;
-    await voter.methods["initSecurityVoterMap()"]({ from: firstAccount });
     await voter.voteSecurity(stockName, voteState, {
-      from: firstAccount,
+      from: accountAddress,
     });
   }
 });
